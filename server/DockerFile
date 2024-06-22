@@ -1,4 +1,3 @@
-# multistage docker build. This redices the size of the final docker image.
 # stage 1 to build the app
 FROM golang:alpine as builder
 
