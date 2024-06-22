@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github/varinder/url-shortner/routes"
 	"log"
 	"os"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func routes(app *fiber.App) {
+func routesInit(app *fiber.App) {
 	app.Get("/:url", routes.ResolveURL)
 	app.Post("/api/v1", routes.ShortenURL)
 }
@@ -28,8 +29,8 @@ func main() {
 
 	app.Use(logger.New())
 
-	routes(app)
+	routesInit(app)
 
-		app.Listen(os.Getenv("APP_PORT"))
-		log.Fatal(app.Listen(os.Getenv("APP_PORT")))
+	app.Listen(os.Getenv("APP_PORT"))
+	log.Fatal(app.Listen(os.Getenv("APP_PORT")))
 }
