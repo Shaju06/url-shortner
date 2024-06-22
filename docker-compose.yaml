@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  server:
+    build: server
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+  db:
+    build: server/db
+    ports:
+      - "6379:6379"
+    volumes:
+      - .data:/data
