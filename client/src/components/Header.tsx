@@ -9,17 +9,30 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Link2, Link2Icon, LinkIcon, LogOut, User } from "lucide-react";
+import { LinkIcon, LogOut, User } from "lucide-react";
+import { createSuperbaseClient } from "@/utils/superbase/client";
+import userSession from "@/use-session";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
-  const user = true;
-  const [position, setPosition] = useState("bottom");
+  const { session } = userSession();
+
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const superBase = await createSuperbaseClient();
+    const { error } = await superBase.auth.signOut();
+    console.log(error, "error");
+    if (!error) router.push("/auth");
+  };
+
+  const handleLogin = () => {
+    router.push("/auth");
+  };
 
   return (
     <header className="p-5 border-b-2">
@@ -33,8 +46,10 @@ const Header = () => {
           />
         </div>
         <div className="mr-10">
-          {!user ? (
-            <Button variant={"outline"}>Login</Button>
+          {!session ? (
+            <Button variant={"outline"} onClick={handleLogin}>
+              Login
+            </Button>
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -52,7 +67,7 @@ const Header = () => {
                   <DropdownMenuItem>
                     <LinkIcon className="mr-2 w-4 h-4" /> Links
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 w-4 h-4" />
                     Logout
                   </DropdownMenuItem>

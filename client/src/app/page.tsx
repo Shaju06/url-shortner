@@ -3,18 +3,23 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import { FormEvent } from "react";
+import { FormEvent, useMemo } from "react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { createSuperbaseClient } from "@/utils/superbase/client";
+import userSession from "@/use-session";
 
 export default function Home() {
   const handleSubmit = (evt: FormEvent) => {
     evt.preventDefault();
   };
+  const { session } = userSession();
+
+  console.log(session);
 
   return (
     <section className="flex justify-center items-center flex-col">
