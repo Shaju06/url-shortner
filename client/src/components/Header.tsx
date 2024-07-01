@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {
@@ -47,7 +47,11 @@ const Header = () => {
         </div>
         <div className="mr-10">
           {!session ? (
-            <Button variant={"outline"} onClick={handleLogin}>
+            <Button
+              className="bg-primary"
+              // variant={"outline"}
+              onClick={handleLogin}
+            >
               Login
             </Button>
           ) : (
@@ -64,7 +68,11 @@ const Header = () => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      router.push("/dashboard");
+                    }}
+                  >
                     <LinkIcon className="mr-2 w-4 h-4" /> Links
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
