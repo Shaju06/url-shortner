@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import { FormEvent, useMemo } from "react";
+import { FormEvent, useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -12,10 +12,15 @@ import {
 } from "@/components/ui/accordion";
 import { createSuperbaseClient } from "@/utils/superbase/client";
 import userSession from "@/use-session";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const [longUrl, setLongUrl] = useState<string>("");
+  const router = useRouter();
+
   const handleSubmit = (evt: FormEvent) => {
     evt.preventDefault();
+    if (longUrl) router.push(`/auth?createNew=${longUrl}`);
   };
   const { session } = userSession();
 
@@ -31,29 +36,41 @@ export default function Home() {
           onSubmit={handleSubmit}
           className="w-full  flex flex-col sm:flex-row gap-2 md:px-20 "
         >
-          <Input className="" type="url" placeholder="Enter your url" />
-          <Button>Url shortener</Button>
+          <Input
+            className=""
+            type="url"
+            placeholder="Enter your url"
+            onChange={(e) => setLongUrl(e.target.value)}
+          />
+          <Button className="bg-primary">Url shortener</Button>
         </form>
-        <div className="mt-10 w-full">
+        <div className="mt-20 w-full">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1">
-              <AccordionTrigger>Is it accessible?</AccordionTrigger>
+              <AccordionTrigger>
+                How does this URL shortener works?
+              </AccordionTrigger>
               <AccordionContent>
-                Yes. It adheres to the WAI-ARIA design pattern.
+                When you enter a long URL, our system generates a shorter
+                version of that URL. This shortened URL redirects to the
+                original long URL when accessed.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">
-              <AccordionTrigger>Is it styled?</AccordionTrigger>
+              <AccordionTrigger>Do I need to create a accout?</AccordionTrigger>
               <AccordionContent>
-                Yes. It comes with default styles that matches the other
-                components&apos; aesthetic.
+                Yes. Creating an account allows you to manage your URLs, view
+                analytics, and customize your short URLs.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3">
-              <AccordionTrigger>Is it animated?</AccordionTrigger>
+              <AccordionTrigger>
+                What analytics are available for my shortened URLs?
+              </AccordionTrigger>
               <AccordionContent>
-                Yes. It's animated by default, but you can disable it if you
-                prefer.
+                You can view the number of clicks, geolocation data of the
+                clicks and device types (mobile/desktop) for each of your
+                shortened URLs.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
