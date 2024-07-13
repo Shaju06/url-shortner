@@ -1,6 +1,7 @@
+import LinkDetails from "@/components/LinkDetails";
+
 const Link = ({ params }: { params: { linkId: string } }) => {
-  console.log(params);
-  return <p>link {params.linkId}</p>;
+  return <LinkDetails id={params.linkId} />;
 };
 
 export default Link;
