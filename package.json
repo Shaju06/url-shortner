@@ -1,0 +1,13 @@
+{
+  "name": "url-shortner",
+  "private": true,
+  "workspaces": [
+    "client"
+  ],
+  "scripts": {
+    "dev:client": "yarn workspace client dev",
+    "build:client": "yarn workspace client build",
+    "start:client": "yarn workspace client start",
+    "lint:client": "yarn workspace client lint"
+  }
+}

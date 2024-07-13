@@ -13,10 +13,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import * as Yup from "yup";
 import ValidationError from "./ValidationError";
 import { useRouter } from "next/navigation";
+import useFetch from "@/useFetch";
+import { useSearchParams } from "next/navigation";
 
 const Login = () => {
   const [formData, setFormData] = useState<{ email: string; password: string }>(
@@ -27,9 +29,19 @@ const Login = () => {
   );
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { loading, error, fn: fnLogin, data } = useFetch(loginAction, formData);
+  const searchParams = useSearchParams();
+  const longLink = searchParams.get("createNew");
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const router = useRouter();
+
+  useEffect(() => {
+    if (error === null && data) {
+      // fetchUser();
+      router.push(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
+    }
+  }, [error, data]);
 
   const handleFormSubmit = async () => {
     setErrors({});
@@ -57,11 +69,11 @@ const Login = () => {
     setIsLoading(true);
     ("use server");
 
-    const response = await loginAction(formData);
+    const response = await fnLogin(formData);
 
-    if (response?.user) {
-      router.push("/");
-    }
+    // if (response?.user) {
+    //   router.push("/");
+    // }
 
     setIsLoading(false);
   };

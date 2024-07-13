@@ -11,12 +11,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import * as Yup from "yup";
 import ValidationError from "./ValidationError";
 import { signupAction } from "@/app/actions";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import useFetch from "@/useFetch";
 
 const Signup = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -25,8 +26,22 @@ const Signup = () => {
     name: string;
     password: string;
   }>({ name: "", email: "", password: "" });
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
+  const longLink = useSearchParams().get("createNew");
+
+  const {
+    loading,
+    error,
+    fn: fnSignup,
+    data,
+  } = useFetch(signupAction, formData);
+
+  useEffect(() => {
+    if (error === null && data) {
+      router.push(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error, loading]);
 
   const handleInputChange = (evt: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = evt.target;
@@ -60,16 +75,6 @@ const Signup = () => {
 
       setErrors(newErrors);
     }
-    setIsLoading(true);
-
-    ("use server");
-
-    await signupAction(formData);
-
-    // const respo = await loginAction(formData);
-    // console.log(respo);
-    setIsLoading(false);
-    router.push("/");
   };
 
   return (
@@ -119,7 +124,7 @@ const Signup = () => {
       <CardFooter className="flex w-full">
         <Button size={"lg"} onClick={handleFormSubmit}>
           Signup
-          {isLoading && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
+          {loading && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
         </Button>
       </CardFooter>
     </Card>
