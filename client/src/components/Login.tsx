@@ -28,7 +28,6 @@ const Login = () => {
     }
   );
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { loading, error, fn: fnLogin, data } = useFetch(loginAction, formData);
   const searchParams = useSearchParams();
   const longLink = searchParams.get("createNew");
@@ -66,16 +65,9 @@ const Login = () => {
       setErrors(newErrors);
       return;
     }
-    setIsLoading(true);
     ("use server");
 
-    const response = await fnLogin(formData);
-
-    // if (response?.user) {
-    //   router.push("/");
-    // }
-
-    setIsLoading(false);
+    const response = await fnLogin();
   };
 
   const handleInputChange = (evt: ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +82,9 @@ const Login = () => {
     <Card className="w-[400px]">
       <CardHeader>
         <CardTitle>Login Form</CardTitle>
-        {/* <CardDescription>Deploy your new project in one-click.</CardDescription> */}
+        <CardDescription className="text-red-400 text-lg  pt-2">
+          {error?.message}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form>
@@ -121,9 +115,9 @@ const Login = () => {
         </form>
       </CardContent>
       <CardFooter className="flex w-full">
-        <Button onClick={handleFormSubmit} size={"lg"} disabled={isLoading}>
+        <Button onClick={handleFormSubmit} size={"lg"} disabled={loading}>
           Login
-          {isLoading && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
+          {loading && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
         </Button>
       </CardFooter>
     </Card>

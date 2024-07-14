@@ -2,6 +2,7 @@
 
 import { createSuperbaseServerClient } from "@/utils/superbase/server";
 import { cookies } from "next/headers";
+import { UAParser } from "ua-parser-js";
 
 export async function loginAction(formData: {
   email: string;
@@ -14,6 +15,9 @@ export async function loginAction(formData: {
       email,
       password,
     });
+    if (!data?.user) {
+      throw new Error("Invalid email/password");
+    }
     return { user: data.user };
   } catch (err: any) {
     console.log(err);
@@ -82,12 +86,12 @@ export async function createUrl(
   const blob = await base64Response.blob();
 
   const { error: storageError } = await supabase.storage
-    .from("qrs")
+    .from("qrcode")
     .upload(fileName, blob);
 
   if (storageError) throw new Error(storageError.message);
 
-  const qr = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/qrs/${fileName}`;
+  const qr = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/qrcode/${fileName}`;
 
   const { data, error } = await supabase
     .from("urls")
@@ -156,3 +160,51 @@ export async function deleteUrl(id: { id: string }) {
 
   return data;
 }
+
+export async function getVisitedUrls(urlIds: string[]) {
+  const supabase = await createSuperbaseServerClient(cookies());
+  const { data, error } = await supabase
+    .from("url_visits")
+    .select("*")
+    .in("url_id", urlIds);
+
+  if (error) {
+    console.error("Error fetching visits:", error);
+    return null;
+  }
+
+  return data;
+}
+
+export const storeVisits = async ({
+  id,
+  original_url,
+}: {
+  id: string;
+  original_url: string;
+}) => {
+  try {
+    const parser = new UAParser();
+    const res = parser.getResult();
+    const device = res?.type || "desktop";
+    const supabase = await createSuperbaseServerClient(cookies());
+    console.log(res, "fsdfsfs");
+
+    const response = await fetch("https://ipapi.co/json");
+    const { city, country_name: country, lat, lng } = await response.json();
+
+    await supabase.from("url_visits").insert({
+      url_id: id,
+      city: city,
+      country: country,
+      device: device,
+      lat,
+      lng,
+    });
+
+    // Redirect to the original URL
+    window.location.href = original_url;
+  } catch (error) {
+    console.error("Error recording click:", error);
+  }
+};

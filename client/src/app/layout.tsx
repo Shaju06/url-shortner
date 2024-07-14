@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import IsAuth from "@/components/IsAuth";
+import React from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +22,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Header />
-        <main className="flex-1">{children}</main>
+        <IsAuth>
+          <main className="flex-1">{children}</main>
+        </IsAuth>
         <Footer />
       </body>
     </html>

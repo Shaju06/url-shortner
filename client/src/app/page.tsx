@@ -24,8 +24,6 @@ export default function Home() {
   };
   const { session } = userSession();
 
-  console.log(session);
-
   return (
     <section className="flex justify-center items-center flex-col">
       <div>
