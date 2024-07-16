@@ -186,24 +186,27 @@ export const storeVisits = async ({
   try {
     const parser = new UAParser();
     const res = parser.getResult();
-    const device = res?.type || "desktop";
+    const device = res?.device?.type || "desktop";
     const supabase = await createSuperbaseServerClient(cookies());
-    console.log(res, "fsdfsfs");
 
     const response = await fetch("https://ipapi.co/json");
-    const { city, country_name: country, lat, lng } = await response.json();
+    const {
+      city,
+      country_name: country,
+      latitude: lat,
+      longitude: lng,
+    } = await response.json();
 
-    await supabase.from("url_visits").insert({
+    const result = await supabase.from("url_visits").insert({
       url_id: id,
-      city: city,
-      country: country,
-      device: device,
+      city,
+      country,
+      device,
       lat,
       lng,
     });
 
-    // Redirect to the original URL
-    window.location.href = original_url;
+    return { redirectTo: original_url };
   } catch (error) {
     console.error("Error recording click:", error);
   }
