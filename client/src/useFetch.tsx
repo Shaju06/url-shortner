@@ -12,7 +12,7 @@ type UseFetchReturn<T> = {
 };
 
 const useFetch = <T,>(
-  cb: (options: UseFetchOptions, ...args: any[]) => Promise<T>,
+  cb: (options: any, ...args: any[]) => Promise<T>,
   options: UseFetchOptions = {}
 ): UseFetchReturn<T> => {
   const [data, setData] = useState<T | null>(null);

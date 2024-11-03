@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createSuperbaseClient } from "./utils/superbase/client";
+import { supabase } from "./utils/superbase/client";
 
 const userSession = () => {
   const [session, setSession] = useState<any>(null);
@@ -7,8 +7,7 @@ const userSession = () => {
 
   useEffect(() => {
     const getSession = async () => {
-      const superbase = await createSuperbaseClient();
-      const session = await superbase.auth.getSession();
+      const session = await supabase.auth.getSession();
       setSession(session.data.session);
       setIsLoading(false);
     };

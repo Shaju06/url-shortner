@@ -14,7 +14,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { LinkIcon, LogOut, User } from "lucide-react";
-import { createSuperbaseClient } from "@/utils/superbase/client";
+import { supabase } from "@/utils/superbase/client";
 import userSession from "@/use-session";
 import { useRouter } from "next/navigation";
 
@@ -24,9 +24,8 @@ const Header = () => {
   const router = useRouter();
 
   const handleLogout = async () => {
-    const superBase = await createSuperbaseClient();
-    const { error } = await superBase.auth.signOut();
-    console.log(error, "error");
+    const { error } = await supabase.auth.signOut();
+
     if (!error) router.push("/auth");
   };
 

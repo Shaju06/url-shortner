@@ -76,58 +76,75 @@ export async function createUrl(
   { title, longUrl, customUrl, user_id }: Params,
   qrcodeBase64: string
 ) {
-  console.log(title, longUrl, customUrl, user_id, qrcodeBase64);
   const short_url = Math.random().toString(36).substring(2, 6);
   const fileName = `qr-${short_url}`;
   const supabase = await createSuperbaseServerClient(cookies());
 
-  const base64Response = await fetch(`data:image/jpeg;base64,${qrcodeBase64}`);
+  try {
+    const base64Response = await fetch(
+      `data:image/jpeg;base64,${qrcodeBase64}`
+    );
+    const blob = await base64Response.blob();
 
-  const blob = await base64Response.blob();
+    // Upload QR code to Supabase storage
+    const { error: storageError } = await supabase.storage
+      .from("qrcode")
+      .upload(fileName, blob);
 
-  const { error: storageError } = await supabase.storage
-    .from("qrcode")
-    .upload(fileName, blob);
+    if (storageError) {
+      console.error("Storage upload error:", storageError);
+      throw new Error(`Failed to upload QR code: ${storageError.message}`);
+    }
 
-  if (storageError) throw new Error(storageError.message);
+    const qr = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/qrcode/${fileName}`;
 
-  const qr = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/qrcode/${fileName}`;
+    // Insert URL data into the database
+    const { data, error } = await supabase
+      .from("urls")
+      .insert([
+        {
+          title,
+          user_id,
+          original_url: longUrl,
+          custom_url: customUrl || null,
+          short_url: "fdf",
+          qr: qr,
+        },
+      ])
+      .select();
 
-  const { data, error } = await supabase
-    .from("urls")
-    .insert([
-      {
-        title,
-        user_id,
-        original_url: longUrl,
-        custom_url: customUrl || null,
-        short_url,
-        qr_code: qr,
-      },
-    ])
-    .select();
+    if (error) {
+      console.error("Database insertion error:", error);
+      throw new Error(
+        "Error creating short URL. Check database constraints and values."
+      );
+    }
 
-  if (error) {
-    console.error(error);
-    throw new Error("Error creating short URL");
+    console.log("URL created successfully:", data);
+    return data;
+  } catch (err: any) {
+    console.error("An error occurred in createUrl function:", err);
+    throw new Error(`createUrl failed: ${err.message}`);
   }
-
-  return data;
 }
 
 export async function getUrls(user_id: string) {
-  const supabase = await createSuperbaseServerClient(cookies());
-  let { data, error } = await supabase
-    .from("urls")
-    .select("*")
-    .eq("user_id", user_id);
+  try {
+    const supabase = await createSuperbaseServerClient(cookies());
+    let { data, error } = await supabase
+      .from("urls")
+      .select("*")
+      .eq("user_id", user_id);
 
-  if (error) {
-    console.error(error);
-    throw new Error("Unable to load URLs");
+    if (error) {
+      console.error(error);
+      throw new Error("Unable to load URLs");
+    }
+    return data;
+  } catch (err: any) {
+    console.error("An error occurred in getUrls function:", err);
+    throw new Error(`createUrl failed: ${err.message}`);
   }
-
-  return data;
 }
 
 export async function getUrl({ id, user_id }: { id: string; user_id: string }) {

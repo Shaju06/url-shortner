@@ -9,8 +9,6 @@ const IsAuth = ({ children }: { children: React.ReactElement }) => {
   const { session, isLoading } = userSession();
   const pathName = usePathname();
 
-  console.log(session, pathName, "fsfsf");
-
   useEffect(() => {
     if (!session && pathName !== "/" && !isLoading) {
       router.push("/auth");
@@ -23,7 +21,10 @@ const IsAuth = ({ children }: { children: React.ReactElement }) => {
     });
   });
 
-  console.log(React.cloneElement(children, { isAuth: true }), "cloneElemn");
+  console.log(
+    React.cloneElement(children, { isAuth: true, session }),
+    "cloneElemn"
+  );
 
   return (
     <>
