@@ -15,11 +15,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { LinkIcon, LogOut, User } from "lucide-react";
 import { supabase } from "@/utils/superbase/client";
-import userSession from "@/use-session";
+import useSession from "@/use-session";
 import { useRouter } from "next/navigation";
 
 const Header = () => {
-  const { session } = userSession();
+  const { session } = useSession();
 
   const router = useRouter();
 

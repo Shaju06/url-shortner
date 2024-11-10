@@ -1,7 +1,7 @@
 "use client";
 
 import { getUrl, getVisitedUrls } from "@/app/actions";
-import userSession from "@/use-session";
+import useSession from "@/use-session";
 import useFetch from "@/useFetch";
 import { Copy, Download, LinkIcon, Trash } from "lucide-react";
 import Link from "next/link";
@@ -11,7 +11,7 @@ import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 const LinkDetails = ({ id }: { id: string }) => {
-  const { session } = userSession();
+  const { session } = useSession();
 
   const {
     loading,
@@ -35,7 +35,7 @@ const LinkDetails = ({ id }: { id: string }) => {
       console.log(session);
       fn();
     }
-  }, [session]);
+  }, [fn]);
 
   // console.log(url, error);
 
@@ -51,18 +51,20 @@ const LinkDetails = ({ id }: { id: string }) => {
           {url?.title}
         </span>
         <Link
-          className="text-3xl sm:text-4xl text-blue-400 font-bold hover:underline cursor-pointer"
-          href={`https://trimrr.in/${link}`}
+          className="text-3xl sm:text-4xl text-blue-400 font-bold hover:underline cursor-pointer break-all"
+          href={`${process.env.NEXT_PUBLIC_HOST_URL}${link}`}
           target="_blank"
         >
-          https://urlshort/{link}
+          {process.env.NEXT_PUBLIC_HOST_URL}
+          {link}
         </Link>
         <Link
-          className="flex items-center gap-1 hover:underline cursor-pointer"
+          className="flex items-center gap-1 hover:underline cursor-pointer break-all"
           href={url?.original_url || ""}
           target="_blank"
         >
           <LinkIcon className="p-1" />
+
           {url?.original_url}
         </Link>
         <span className="flex items-end font-extralight text-sm">
@@ -71,7 +73,9 @@ const LinkDetails = ({ id }: { id: string }) => {
         <div className="flex gap-2">
           <Button
             onClick={() =>
-              navigator.clipboard.writeText(`https://urlshort.in/${link}`)
+              navigator.clipboard.writeText(
+                `${process.env.NEXT_PUBLIC_HOST_URL}${link}`
+              )
             }
           >
             <Copy />

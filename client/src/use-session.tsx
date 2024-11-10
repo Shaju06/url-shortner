@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./utils/superbase/client";
 
-const userSession = () => {
+const useSession = () => {
   const [session, setSession] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -17,4 +17,4 @@ const userSession = () => {
   return { session, isLoading };
 };
 
-export default userSession;
+export default useSession;

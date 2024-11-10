@@ -10,8 +10,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { createSuperbaseClient } from "@/utils/superbase/client";
-import userSession from "@/use-session";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
@@ -22,7 +20,6 @@ export default function Home() {
     evt.preventDefault();
     if (longUrl) router.push(`/auth?createNew=${longUrl}`);
   };
-  const { session } = userSession();
 
   return (
     <section className="flex justify-center items-center flex-col">

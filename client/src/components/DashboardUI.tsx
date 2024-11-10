@@ -3,7 +3,7 @@ import { Filter } from "lucide-react";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Input } from "./ui/input";
 import CreateNewLink from "./CreateNewLink";
-import userSession from "@/use-session";
+import useSession from "@/use-session";
 import useFetch from "@/useFetch";
 import { getUrl, getUrls, getVisitedUrls } from "@/app/actions";
 import { useEffect, useMemo, useState } from "react";
@@ -11,7 +11,7 @@ import LinkDetails from "./LinkDetails";
 import LinkCard from "./LinkCard";
 
 const DashboardUI = () => {
-  const { session } = userSession();
+  const { session } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const {
     loading,
@@ -33,7 +33,7 @@ const DashboardUI = () => {
 
   useEffect(() => {
     if (session?.user?.id) fnUrls();
-  }, [session?.user?.id]);
+  }, [fnUrls, session?.user?.id]);
 
   const filteredUrls = useMemo(
     () =>
