@@ -29,12 +29,7 @@ const Signup = () => {
   const router = useRouter();
   const longLink = useSearchParams().get("createNew");
 
-  const {
-    loading,
-    error,
-    fn: fnSignup,
-    data,
-  } = useFetch(signupAction, formData);
+  const { loading, error, fn: fnSignup, data } = useFetch(signupAction);
 
   useEffect(() => {
     if (error === null && data) {

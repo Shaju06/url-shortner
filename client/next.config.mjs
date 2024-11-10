@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  crossOrigin: "anonymous",
   images: {
-    domains: ["gqjifxazbxfegehahnza.supabase.co"],
+    domains: ["imvulibggkzepugpleoa.supabase.co"],
   },
 };
 

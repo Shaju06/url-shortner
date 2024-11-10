@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
-import { createSuperbaseClient } from "./utils/superbase/client";
+import { supabase } from "./utils/superbase/client";
 
-const userSession = () => {
+const useSession = () => {
   const [session, setSession] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const getSession = async () => {
-      const superbase = await createSuperbaseClient();
-      const session = await superbase.auth.getSession();
+      const session = await supabase.auth.getSession();
       setSession(session.data.session);
+      setIsLoading(false);
     };
     getSession();
   }, []);
 
-  return { session };
+  return { session, isLoading };
 };
 
-export default userSession;
+export default useSession;
