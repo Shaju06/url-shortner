@@ -21,11 +21,6 @@ const IsAuth = ({ children }: { children: React.ReactElement }) => {
     });
   });
 
-  console.log(
-    React.cloneElement(children, { isAuth: true, session }),
-    "cloneElemn"
-  );
-
   return (
     <>
       {isLoading ? (

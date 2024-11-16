@@ -17,7 +17,7 @@ import * as yup from "yup";
 import { Card } from "./ui/card";
 import useFetch from "@/useFetch";
 import { createUrl } from "@/app/actions";
-import useSession from "@/use-session";
+import useSession from "@/useSession";
 import { QRCode } from "react-qrcode-logo";
 import ValidationError from "./ValidationError";
 import { ReloadIcon } from "@radix-ui/react-icons";
@@ -46,8 +46,6 @@ const CreateNewLink = () => {
 
   const router = useRouter();
 
-  console.log(error, data, "fdfdf");
-
   const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
     setFormValues({
       ...formValues,
@@ -61,7 +59,7 @@ const CreateNewLink = () => {
       .string()
       .url("Must be a valid URL")
       .required("Long URL is required"),
-    customUrl: yup.string(),
+    customUrl: yup.string().matches(/^[a-zA-Z]*$/, "Only letters are allowed."),
   });
 
   useEffect(() => {
@@ -78,11 +76,8 @@ const CreateNewLink = () => {
       const canvas = qrRef?.current?.canvasRef?.current;
 
       const base64Data = canvas.toDataURL().split(",")[1];
-      console.log(base64Data, "base64Data");
-
       await fnCreateUrl(base64Data);
     } catch (err: any) {
-      console.log(err, err?.inner, "ssdf");
       let newErrors: { [key: string]: string } = {};
 
       err?.inner?.forEach((err: any) => {
@@ -94,7 +89,7 @@ const CreateNewLink = () => {
   };
 
   return (
-    <Dialog>
+    <Dialog defaultOpen={longLink ? true : false}>
       <DialogTrigger asChild>
         <Button>Create new Link</Button>
       </DialogTrigger>
@@ -130,11 +125,12 @@ const CreateNewLink = () => {
           <Card className="p-2">trimrr.in</Card> /
           <Input
             id="customUrl"
-            placeholder="Custom Link (optional)"
+            placeholder="Custom relative link (optional)"
             value={formValues.customUrl}
             onChange={handleChange}
           />
         </div>
+        {errors?.customUrl && <ValidationError message={errors.customUrl} />}
         {error && <ValidationError message={JSON.stringify(errors)} />}
         <DialogFooter>
           <Button

@@ -1,7 +1,7 @@
 "use server";
 
 import { createSuperbaseServerClient } from "@/utils/superbase/server";
-import { cookies } from "next/headers";
+
 import { UAParser } from "ua-parser-js";
 
 export async function loginAction(formData: {
@@ -9,8 +9,9 @@ export async function loginAction(formData: {
   password: string;
 }) {
   const { email, password } = formData;
+
   try {
-    const supabase = await createSuperbaseServerClient(cookies());
+    const supabase = await createSuperbaseServerClient();
     const { data } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -20,7 +21,7 @@ export async function loginAction(formData: {
     }
     return { user: data.user };
   } catch (err: any) {
-    console.log(err);
+    console.log("Error fetch result: ", err);
     throw new Error(err.message);
   }
 }
@@ -32,7 +33,7 @@ export async function signupAction(formData: {
 }) {
   const { name, email, password } = formData;
   try {
-    const supabase = await createSuperbaseServerClient(cookies());
+    const supabase = await createSuperbaseServerClient();
     const { data } = await supabase.auth.signUp({
       email,
       password,
@@ -49,12 +50,12 @@ export async function signupAction(formData: {
   }
 }
 
-export async function getLongUrl(id: number) {
-  const supabase = await createSuperbaseServerClient(cookies());
+export async function getLongUrl({ redirectId }: { redirectId: number }) {
+  const supabase = await createSuperbaseServerClient();
   let { data: shortLinkData, error: shortLinkError } = await supabase
     .from("urls")
     .select("id, original_url")
-    .or(`short_url.eq.${id},custom_url.eq.${id}`)
+    .or(`short_url.eq.${redirectId},custom_url.eq.${redirectId}`)
     .single();
 
   if (shortLinkError && shortLinkError.code !== "PGRST116") {
@@ -78,7 +79,7 @@ export async function createUrl(
 ) {
   const short_url = Math.random().toString(36).substring(2, 6);
   const fileName = `qr-${short_url}`;
-  const supabase = await createSuperbaseServerClient(cookies());
+  const supabase = await createSuperbaseServerClient();
 
   try {
     const base64Response = await fetch(
@@ -107,7 +108,7 @@ export async function createUrl(
           user_id,
           original_url: longUrl,
           custom_url: customUrl || null,
-          short_url: "fdf",
+          short_url: short_url,
           qr: qr,
         },
       ])
@@ -130,7 +131,7 @@ export async function createUrl(
 
 export async function getUrls(user_id: string) {
   try {
-    const supabase = await createSuperbaseServerClient(cookies());
+    const supabase = await createSuperbaseServerClient();
     let { data, error } = await supabase
       .from("urls")
       .select("*")
@@ -148,7 +149,7 @@ export async function getUrls(user_id: string) {
 }
 
 export async function getUrl({ id, user_id }: { id: string; user_id: string }) {
-  const supabase = await createSuperbaseServerClient(cookies());
+  const supabase = await createSuperbaseServerClient();
   console.log(id, user_id, "payloa");
 
   const { data, error } = await supabase
@@ -167,8 +168,10 @@ export async function getUrl({ id, user_id }: { id: string; user_id: string }) {
 }
 
 export async function deleteUrl(id: { id: string }) {
-  const supabase = await createSuperbaseServerClient(cookies());
+  const supabase = await createSuperbaseServerClient();
   const { data, error } = await supabase.from("urls").delete().eq("id", id);
+
+  console.log(data, error, id, "fsdf");
 
   if (error) {
     console.error(error);
@@ -178,19 +181,22 @@ export async function deleteUrl(id: { id: string }) {
   return data;
 }
 
-export async function getVisitedUrls(urlIds: string[]) {
-  const supabase = await createSuperbaseServerClient(cookies());
-  const { data, error } = await supabase
-    .from("url_visits")
-    .select("*")
-    .in("url_id", urlIds);
+export async function getVisitedUrls({ urlIds }: { urlIds: string[] }) {
+  try {
+    const supabase = await createSuperbaseServerClient();
 
-  if (error) {
-    console.error("Error fetching visits:", error);
-    return null;
+    const { data, error } = await supabase
+      .from("url_visits")
+      .select("*")
+      .in("url_id", urlIds);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  } catch (err: any) {
+    console.error("Error fetching visits:", err.message);
+    return "Some thing went wrong";
   }
-
-  return data;
 }
 
 export const storeVisits = async ({
@@ -204,7 +210,7 @@ export const storeVisits = async ({
     const parser = new UAParser();
     const res = parser.getResult();
     const device = res?.device?.type || "desktop";
-    const supabase = await createSuperbaseServerClient(cookies());
+    const supabase = await createSuperbaseServerClient();
 
     const response = await fetch("https://ipapi.co/json");
     const {
