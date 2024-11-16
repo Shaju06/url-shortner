@@ -42,6 +42,21 @@ const Login = () => {
     }
   }, [error, data]);
 
+  // useEffect(() => {
+  //   const handleKeyPress = (event: KeyboardEvent) => {
+  //     console.log(event, "dfdf");
+  //     if (event.key === "Enter") {
+  //       handleFormSubmit();
+  //     }
+  //   };
+
+  //   document.addEventListener("keydown", handleKeyPress);
+
+  //   return () => {
+  //     document.removeEventListener("keydown", handleKeyPress);
+  //   };
+  // }, []);
+
   const handleFormSubmit = async () => {
     setErrors({});
     try {
@@ -67,7 +82,9 @@ const Login = () => {
     }
     ("use server");
 
-    const response = await fnLogin();
+    await fnLogin();
+
+    router.refresh();
   };
 
   const handleInputChange = (evt: ChangeEvent<HTMLInputElement>) => {

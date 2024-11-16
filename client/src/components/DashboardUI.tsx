@@ -3,16 +3,17 @@ import { Filter } from "lucide-react";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Input } from "./ui/input";
 import CreateNewLink from "./CreateNewLink";
-import useSession from "@/use-session";
+import useSession from "@/useSession";
 import useFetch from "@/useFetch";
-import { getUrl, getUrls, getVisitedUrls } from "@/app/actions";
+import { getUrls, getVisitedUrls } from "@/app/actions";
 import { useEffect, useMemo, useState } from "react";
-import LinkDetails from "./LinkDetails";
 import LinkCard from "./LinkCard";
+import Loader from "./Loader";
 
 const DashboardUI = () => {
   const { session } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
+
   const {
     loading,
     error,
@@ -24,16 +25,17 @@ const DashboardUI = () => {
     loading: loadingVisits,
     data: visits,
     fn: fnVisits,
-  } = useFetch(
-    getVisitedUrls,
-    urls?.map((url) => url.id)
-  );
-
-  console.log(visits, "fdfsdf");
+  } = useFetch(getVisitedUrls, { urlIds: urls?.map((url) => url.id) });
 
   useEffect(() => {
     if (session?.user?.id) fnUrls();
   }, [fnUrls, session?.user?.id]);
+
+  useEffect(() => {
+    if (urls) {
+      fnVisits();
+    }
+  }, [urls?.length]);
 
   const filteredUrls = useMemo(
     () =>
@@ -43,6 +45,9 @@ const DashboardUI = () => {
     [searchQuery, urls]
   );
 
+  if (loading || loadingVisits) {
+    return <Loader />;
+  }
   return (
     <div className="flex flex-col gap-4 mt-6 container">
       <div className="grid grid-cols-2 gap-4">
@@ -67,8 +72,10 @@ const DashboardUI = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <Filter className="absolute top-2 right-2 p-1 cursor-pointer" />
-      </div>
-      {filteredUrls?.length ? (
+      </div>{" "}
+      {loading ? (
+        <Loader />
+      ) : filteredUrls?.length ? (
         filteredUrls.map((url, i) => (
           <LinkCard key={url?.id} url={url} fetchUrls={fnUrls} />
         ))

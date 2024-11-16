@@ -1,7 +1,7 @@
 "use client";
 
 import { getUrl, getVisitedUrls } from "@/app/actions";
-import useSession from "@/use-session";
+import useSession from "@/useSession";
 import useFetch from "@/useFetch";
 import { Copy, Download, LinkIcon, Trash } from "lucide-react";
 import Link from "next/link";
@@ -9,6 +9,9 @@ import { useEffect, useMemo } from "react";
 import { Button } from "./ui/button";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import Location from "./LocationStats";
+import Device from "./DeviceStats";
+import Loader from "./Loader";
 
 const LinkDetails = ({ id }: { id: string }) => {
   const { session } = useSession();
@@ -24,7 +27,7 @@ const LinkDetails = ({ id }: { id: string }) => {
     loading: loadingStats,
     data: stats,
     fn: fnStats,
-  } = useFetch(getVisitedUrls, id);
+  } = useFetch(getVisitedUrls, { urlIds: [id] });
 
   const link = useMemo(() => {
     return url?.custom_url ? url?.custom_url : url?.short_url;
@@ -32,20 +35,16 @@ const LinkDetails = ({ id }: { id: string }) => {
 
   useEffect(() => {
     if (session) {
-      console.log(session);
       fn();
+      fnStats();
     }
-  }, [fn]);
+  }, [fn, fnStats]);
 
-  // console.log(url, error);
-
+  if (loadingStats || loading) {
+    return <Loader />;
+  }
   return (
-    // {
-    //   loading && (
-    //     <BarLoader
-    //   )
-    // }
-    <div className="container flex flex-col gap-8 sm:flex-row justify-between mt-6">
+    <div className="container flex flex-col gap-8 sm:flex-row justify-between mt-6 mb-6">
       <div className="flex flex-col items-start gap-8 rounded-lg sm:w-2/5">
         <span className="text-4xl hover:underline cursor-pointer">
           {url?.title}
@@ -80,16 +79,16 @@ const LinkDetails = ({ id }: { id: string }) => {
           >
             <Copy />
           </Button>
-          <Button>
+          {/* <Button>
             <Download />
           </Button>
           <Button>
             <Trash />
-          </Button>
+          </Button> */}
         </div>
         <Image
           className="ring ring-blue-500"
-          src={url?.qr_code}
+          src={url?.qr}
           width={200}
           height={200}
           alt={url?.title}
@@ -97,9 +96,9 @@ const LinkDetails = ({ id }: { id: string }) => {
       </div>
       <Card className="sm:w-4/5 ring ring-blue-500 text-center">
         <CardHeader className="text-2xl font-extrabold ">Statistics</CardHeader>
-        {stats && stats.length ? (
-          <CardContent className="flex flex-col gap-6">
-            <Card>
+        {Array.isArray(stats) && stats.length ? (
+          <CardContent className="flex flex-col gap-6 ">
+            <Card className="ring ring-blue-500">
               <CardHeader>
                 <CardTitle>Total Clicks</CardTitle>
               </CardHeader>
@@ -109,9 +108,9 @@ const LinkDetails = ({ id }: { id: string }) => {
             </Card>
 
             <CardTitle>Location Data</CardTitle>
-            {/* <Location stats={stats} /> */}
+            <Location stats={stats} />
             <CardTitle>Device Info</CardTitle>
-            {/* <DeviceStats stats={stats} /> */}
+            <Device stats={stats} />
           </CardContent>
         ) : (
           <CardContent>

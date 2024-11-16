@@ -1,12 +1,12 @@
 "use client";
-import userSession from "@/use-session";
+import useSession from "@/useSession";
 import { useRouter, usePathname } from "next/navigation";
 import React, { useEffect } from "react";
 import { BarLoader } from "react-spinners";
 
 const IsAuth = ({ children }: { children: React.ReactElement }) => {
   const router = useRouter();
-  const { session, isLoading } = userSession();
+  const { session, isLoading } = useSession();
   const pathName = usePathname();
 
   useEffect(() => {
@@ -20,11 +20,6 @@ const IsAuth = ({ children }: { children: React.ReactElement }) => {
       session: true,
     });
   });
-
-  console.log(
-    React.cloneElement(children, { isAuth: true, session }),
-    "cloneElemn"
-  );
 
   return (
     <>

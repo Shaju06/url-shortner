@@ -8,8 +8,6 @@ import useFetch from "@/useFetch";
 import { BeatLoader } from "react-spinners";
 
 const LinkCard = ({ url, fetchUrls }: { url: any; fetchUrls: () => void }) => {
-  console.log(url, "fsdfdsf");
-
   const truncateUrl = useCallback((url: string) => {
     const maxLength = 35;
     if (url?.length > maxLength) {
@@ -42,7 +40,7 @@ const LinkCard = ({ url, fetchUrls }: { url: any; fetchUrls: () => void }) => {
   return (
     <div className="flex flex-col md:flex-row mb-6 gap-5 p-4 border    bg-gray-100 rounded-lg">
       <Image
-        src={url?.qr_code}
+        src={url?.qr}
         className="object-contain ring ring-blue-500 self-start"
         alt={url?.title}
         width={150}

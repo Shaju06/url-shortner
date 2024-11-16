@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 type UseFetchOptions = {
   [key: string]: any;
@@ -19,13 +19,15 @@ const useFetch = <T,>(
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
+  const memoizedOptions = useMemo(() => options, [JSON.stringify(options)]);
+
   const fn = useCallback(
     async (...args: any[]): Promise<void> => {
       setLoading(true);
       setError(null);
       try {
         ("use server");
-        const response = await cb(options, ...args);
+        const response = await cb(memoizedOptions, ...args);
         setData(response);
         setError(null);
       } catch (error: any) {
@@ -34,7 +36,7 @@ const useFetch = <T,>(
         setLoading(false);
       }
     },
-    [cb, options]
+    [cb, memoizedOptions]
   );
 
   return { data, loading, error, fn };

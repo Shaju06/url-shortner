@@ -6,12 +6,12 @@ const useSession = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const getSession = async () => {
-      const session = await supabase.auth.getSession();
-      setSession(session.data.session);
+    const fetchSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session);
       setIsLoading(false);
     };
-    getSession();
+    fetchSession();
   }, []);
 
   return { session, isLoading };

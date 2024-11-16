@@ -7,7 +7,7 @@ import { BarLoader } from "react-spinners";
 
 const RedirectPage = ({ params }: { params: { redirectId: string } }) => {
   const { redirectId } = params;
-  const { loading, data, fn } = useFetch(getLongUrl, redirectId);
+  const { loading, data, fn } = useFetch(getLongUrl, { redirectId });
 
   const {
     loading: loadingStats,
@@ -18,11 +18,9 @@ const RedirectPage = ({ params }: { params: { redirectId: string } }) => {
     original_url: data?.original_url,
   });
 
-  console.log();
-
   useEffect(() => {
     fn();
-  }, []);
+  }, [fn]);
 
   useEffect(() => {
     if (!loading && data) {
